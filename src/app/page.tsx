@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { InteractiveBackground } from "@/components/Interactivebg";
 import { Header } from "@/components/Header";
 import { LexiLogo } from "@/components/LexiLogo";
@@ -19,7 +19,46 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState("AUTO");
-  
+  const [introVisible, setIntroVisible] = useState(true);
+  const [splashExiting, setSplashExiting] = useState(false);
+  const introAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  const completeIntro = () => {
+    setIntroVisible(false);
+    setSplashExiting(false);
+  };
+
+  const handleStart = () => {
+    if (introAudioRef.current) {
+      introAudioRef.current.currentTime = 0;
+      const playPromise = introAudioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.warn("Intro audio play failed:", error);
+        });
+      }
+    }
+
+    setSplashExiting(true);
+
+    window.setTimeout(() => {
+      completeIntro();
+    }, 850);
+  };
+
+  useEffect(() => {
+    if (!introVisible) return;
+    const audio = introAudioRef.current;
+    if (!audio) return;
+
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.warn("Auto-play introduction audio was blocked:", error);
+      });
+    }
+  }, [introVisible]);
+
   // Initialize learning system
   const { userProfile, updateProfileFromMessage } = useLexiLearning("desktop-user");
 
@@ -60,10 +99,17 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to get response");
+        const errorText = await response.text();
+        console.error("lexi-ai-pro error", response.status, errorText);
+        return; // Exit gracefully without throwing
       }
 
       const data = await response.json();
+
+      if (!data || typeof data.response !== "string" || data.response.trim().length === 0) {
+        console.warn("lexi-ai-pro returned no response", data);
+        return; // Exit gracefully without throwing
+      }
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -74,15 +120,7 @@ export default function Home() {
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      console.error("Error:", error);
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content:
-          "Sorry, I encountered an error processing your request. Please try again.",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      console.error("Error in handleSubmit:", error);
     } finally {
       setIsLoading(false);
     }
@@ -92,9 +130,104 @@ export default function Home() {
     setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
   };
 
+  if (introVisible) {
+    return (
+      <>
+        <audio
+          ref={introAudioRef}
+          src="/assets/audio/introduction.mp3"
+          preload="auto"
+          className="hidden"
+          onEnded={() => console.log("Intro audio finished")}
+        />
+
+        <div className="relative min-h-screen overflow-hidden bg-[#050505] text-white">
+          <video
+            className="absolute inset-0 w-full h-full object-cover opacity-55"
+            autoPlay
+            loop
+            muted
+            style={{ border: "none", pointerEvents: "none" }}
+          >
+            <source src="/assets/bg/overlay.mp4" type="video/mp4" />
+          </video>
+
+          <div className="absolute inset-0 bg-[#050505] bg-opacity-90" />
+
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {[...Array(100)].map((_, i) => (
+              <span
+                key={`snow-${i}`}
+                className="snowflake"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 5}s`,
+                  animationDuration: `${6 + Math.random() * 4}s`,
+                  opacity: 0.2 + Math.random() * 0.8,
+                  transform: `translateY(-10vh)`,
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 text-center">
+          <div
+            className={`mb-10 ${splashExiting ? "animate-logo-zoom-out" : "animate-pulse"} duration-1000`}
+          >
+            <LexiLogo />
+          </div>
+          <h1 className="mb-4 text-3xl font-bold sm:text-4xl">Welcome to Lexi AI</h1>
+          <p className="mb-8 max-w-xl text-sm text-gray-300 sm:text-base">
+            Your personal AI assistant is preparing your environment. Tap get started to begin and hear an introduction.
+          </p>
+          <button
+            className="rounded-full bg-white px-8 py-3 font-semibold text-black shadow-lg transition hover:bg-gray-200"
+            onClick={handleStart}
+          >
+            Get Started
+          </button>
+
+          {splashExiting && (
+            <div className="absolute inset-0 pointer-events-none">
+              {[...Array(30)].map((_, i) => {
+                const dx = (Math.random() - 0.5) * 120;
+                const dy = (Math.random() - 0.5) * 120;
+                return (
+                  <span
+                    key={`desktop-dot-${i}`}
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      animationDelay: `${Math.random() * 0.25}s`,
+                      width: `${3 + Math.random() * 3}px`,
+                      height: `${3 + Math.random() * 3}px`,
+                      '--x': `${dx}px`,
+                      '--y': `${dy}px`,
+                    } as React.CSSProperties}
+                    className="absolute rounded-full bg-white opacity-90 animate-particle-burst"
+                  />
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+      </>
+    );
+  }
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#050505]">
-      {/* Video Background - Looping */}
+    <>
+      <audio
+        ref={introAudioRef}
+        src="/assets/audio/introduction.mp3"
+        preload="auto"
+        className="hidden"
+        onEnded={() => console.log("Intro audio finished")}
+      />
+
+      <div className="relative min-h-screen overflow-hidden bg-[#050505]">
+        {/* Video Background - Looping */}
       <video
         className="absolute inset-0 w-full h-full object-cover opacity-55"
         autoPlay
@@ -150,5 +283,6 @@ export default function Home() {
         </p>
       </footer>
     </div>
+  </>
   );
 }

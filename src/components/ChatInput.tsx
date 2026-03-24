@@ -412,13 +412,17 @@ export function ChatInput({
     }
   }, [selectedModel]);
 
-  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const sendMessage = () => {
     if (query.trim() && !isLoading) {
       playSendSound();
-      onSubmit(query, selectedModel);
+      onSubmit(query.trim(), selectedModel);
       setQuery("");
     }
+  };
+
+  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    sendMessage();
   };
 
   return (
@@ -450,6 +454,11 @@ export function ChatInput({
                   playBackspaceSound();
                 } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
                   playTypeSound();
+                }
+
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
                 }
               }}
               onFocus={() => setIsFocused(true)}

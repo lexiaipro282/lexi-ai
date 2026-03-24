@@ -90,6 +90,33 @@
   }
 }
 
+/* Snowfall animation */
+@keyframes snow-fall {
+  0% {
+    transform: translateY(-10%) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(110vh) translateX(20px);
+    opacity: 0;
+  }
+}
+
+.snowflake {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
 @keyframes particle-vanish {
   0% {
     opacity: 1;
@@ -101,6 +128,37 @@
 
 .particle-vanish {
   animation: particle-vanish 0.8s ease-in-out forwards !important;
+}
+
+@keyframes logo-zoom-out {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.animate-logo-zoom-out {
+  animation: logo-zoom-out 0.65s ease-in-out forwards;
+}
+
+@keyframes particle-burst {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(0.2);
+    opacity: 0;
+  }
+}
+
+.animate-particle-burst {
+  position: absolute;
+  animation: particle-burst 0.8s ease-out forwards;
 }
 
 @keyframes blob-morph {
