@@ -122,7 +122,7 @@ catch (error) {
 ### GROK_API_KEY Status
 ✅ **API Key is set** in .env.local:
 ```
-GROK_API_KEY=xai-GgvwK6nIap2OBix0CXoJJ7UQr1wrTBOSdMo188y6vybivLRgs5on9ouwVf0KJg93lgjJ3O2VGitREKUd
+GROK_API_KEY=xai-YOUR_API_KEY_HERE (see .env.local)
 ```
 
 ### queryLexiAPI Flow (src/lib/lexiApi.ts)
