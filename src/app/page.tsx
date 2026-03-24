@@ -176,9 +176,9 @@ export default function Home() {
           >
             <LexiLogo />
           </div>
-          <h1 className="mb-4 text-3xl font-bold sm:text-4xl">Welcome to Lexi AI</h1>
+          <h1 className="mb-4 text-3xl font-bold sm:text-4xl">WELCOME TO LEXI AI®</h1>
           <p className="mb-8 max-w-xl text-sm text-gray-300 sm:text-base">
-            Your personal AI assistant is preparing your environment. Tap get started to begin and hear an introduction.
+             THE MOST POWERFUL AI RESEARCH & DEVELOPMENT PLATFORM
           </p>
           <button
             className="rounded-full bg-white px-8 py-3 font-semibold text-black shadow-lg transition hover:bg-gray-200"
