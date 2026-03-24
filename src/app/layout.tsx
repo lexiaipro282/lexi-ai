@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "./assets/favicon/apple-touch-icon.png",
+        url: "https://raw.githubusercontent.com/lexiaipro282/lexi-ai/refs/heads/main/assets/favicon/apple-touch-icon.png.png",
         width: 1200,
         height: 630,
       },
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     site: "@LEXIAI",
     title: "LEXI AI®",
     description: "NEXT GENERATION OF AI-DEVELOPMENT.",
-    images: ["./assets/favicon/apple-touch-icon.png"],
+    images: ["https://raw.githubusercontent.com/lexiaipro282/lexi-ai/refs/heads/main/assets/favicon/apple-touch-icon.png.png"],
   },
 };
 
